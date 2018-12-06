@@ -27,16 +27,9 @@ class App extends Component {
   }
 
   drawMap = data => {
-    const height = 900;
-    const width = 1200;
-    const x = d3.scaleLinear().range([0, width]);
-    const y = d3.scaleLinear().range([0, height]);
-    const margin = {
-      top: 100,
-      right: 120,
-      bottom: 150,
-      left: 120
-    };
+    const height = 1000;
+    const width = 1000;
+
     const root = d3.hierarchy(data);
     root.sum(d => d.value);
 
@@ -56,18 +49,28 @@ class App extends Component {
       })
       .append("g");
 
-    d3.select("svg g")
+    const nodes = d3
+      .select("svg g")
       .selectAll("rect")
       .data(root.descendants())
-      .enter()
-      .append("rect")
+      .enter();
+
+    nodes.append("rect").attrs({
+      class: "rect",
+      name: d => d.data.name,
+      x: d => d.x0,
+      y: d => d.y0,
+      width: d => d.x1 - d.x0,
+      height: d => d.y1 - d.y0
+    });
+    nodes
+      .append("text")
       .attrs({
-        class: "rect",
-        x: d => d.x0,
-        y: d => d.y0,
-        width: d => d.x1 - d.x0,
-        height: d => d.y1 - d.y0
-      });
+        class: "label",
+        dx: 4,
+        dy: 14
+      })
+      .text(d => d.data.name);
   };
 
   render() {
