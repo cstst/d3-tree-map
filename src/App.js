@@ -36,7 +36,8 @@ class App extends Component {
     const treemap = d3
       .treemap()
       .size([height, width])
-      .paddingOuter(10);
+      .paddingOuter(10)
+      .paddingInner(1);
 
     treemap(root);
 
@@ -66,11 +67,21 @@ class App extends Component {
     nodes
       .append("text")
       .attrs({
-        class: "label",
-        dx: 4,
-        dy: 14
+        class: "label"
       })
-      .text(d => d.data.name);
+      .selectAll("tspan")
+      .data(function(d) {
+        return d.data.name.split(/(?=[A-Z][^A-Z])/g);
+      })
+      .enter()
+      .append("tspan")
+      .attr("x", 4)
+      .attr("y", function(d, i) {
+        return 13 + i * 10;
+      })
+      .text(function(d) {
+        return d;
+      });
   };
 
   render() {
