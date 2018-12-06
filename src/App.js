@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import * as d3 from "d3";
+import moneyCommas from "./moneyCommas";
 import "d3-selection-multi";
 import "./App.css";
 
@@ -29,8 +30,15 @@ class App extends Component {
     treemap(root);
 
     const color = d3.scaleOrdinal(d3.schemeDark2);
-    const svg = d3
+
+    const tooltip = d3
       .select("#treemap")
+      .append("div")
+      .attrs({
+        id: "tooltip"
+      });
+
+    d3.select("#treemap")
       .append("svg")
       .attrs({
         height,
@@ -48,12 +56,36 @@ class App extends Component {
         transform: d => `translate(${[d.x0, d.y0]})`
       });
 
-    nodes.append("rect").attrs({
-      class: "rect",
-      width: d => d.x1 - d.x0,
-      height: d => d.y1 - d.y0,
-      fill: d => color(d.data.category)
-    });
+    nodes
+      .append("rect")
+      .attrs({
+        class: "tile",
+        width: d => d.x1 - d.x0,
+        height: d => d.y1 - d.y0,
+        fill: d => color(d.data.category),
+        "data-name": d => d.data.name,
+        "data-category": d => d.data.category,
+        "data-value": d => d.data.value
+      })
+      .on("mouseover", d => {
+        const { name, category, value } = d.data;
+        tooltip
+          .text(`${name}\n${category}\n$${moneyCommas(value)}`)
+          .attrs({
+            "data-vale": value
+          })
+          .styles({
+            visibility: "visible"
+          });
+      })
+      .on("mousemove", () => {
+        tooltip
+          .style("top", d3.event.pageY - 100 + "px")
+          .style("left", d3.event.pageX - 40 + "px");
+      })
+      .on("mouseout", function() {
+        tooltip.style("visibility", "hidden");
+      });
 
     nodes
       .append("text")
@@ -74,8 +106,10 @@ class App extends Component {
   render() {
     return (
       <div id="container">
-        <h1>Movie Sales</h1>
-        <div>Top 100 Highest Grossing Movies Grouped By Genre</div>
+        <h1 id="title">Movie Sales</h1>
+        <div id="description">
+          Top 100 Highest Grossing Movies Grouped By Genre
+        </div>
         <div id="treemap" />
       </div>
     );

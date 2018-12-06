@@ -4,7 +4,18 @@
   align-items: center;
 }
 
-.rect {
+#tooltip {
+  position: absolute;
+  visibility: hidden;
+  background: white;
+  padding: 0.25em;
+  border: 1px solid black;
+  opacity: 0.9;
+  white-space: pre-wrap;
+  z-index: 10;
+}
+
+.tile {
   stroke: white;
   stroke-width: 1;
 }
