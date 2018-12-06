@@ -11,18 +11,6 @@ class App extends Component {
     const movies = await fetch(
       "https://cdn.rawgit.com/freeCodeCamp/testable-projects-fcc/a80ce8f9/src/data/tree_map/movie-data.json"
     ).then(res => res.json());
-    /*
-    const genres = movies.children;
-    console.log(genres);
-    const genreTotals = genres.map(genre => {
-      const name = genre.name;
-      const total = genre.children.reduce(
-        (acc, val) => acc + parseInt(val.value),
-        0
-      );
-      return { name, total };
-    });
-    */
     this.drawMap(movies);
   }
 
@@ -52,36 +40,28 @@ class App extends Component {
 
     const nodes = d3
       .select("svg g")
-      .selectAll("rect")
+      .selectAll("g")
       .data(root.descendants())
-      .enter();
+      .enter()
+      .append("g")
+      .attrs({
+        transform: d => `translate(${[d.x0, d.y0]})`
+      });
 
     nodes.append("rect").attrs({
       class: "rect",
-      name: d => d.data.name,
-      x: d => d.x0,
-      y: d => d.y0,
       width: d => d.x1 - d.x0,
       height: d => d.y1 - d.y0
     });
+
     nodes
       .append("text")
       .attrs({
-        class: "label"
+        class: "label",
+        dx: 4,
+        dy: 14
       })
-      .selectAll("tspan")
-      .data(function(d) {
-        return d.data.name.split(/(?=[A-Z][^A-Z])/g);
-      })
-      .enter()
-      .append("tspan")
-      .attr("x", 4)
-      .attr("y", function(d, i) {
-        return 13 + i * 10;
-      })
-      .text(function(d) {
-        return d;
-      });
+      .text(d => d.data.name);
   };
 
   render() {
