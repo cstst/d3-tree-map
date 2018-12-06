@@ -15,22 +15,22 @@ class App extends Component {
   }
 
   drawMap = data => {
-    const height = 1000;
-    const width = 1000;
+    const height = 600;
+    const width = 1200;
 
     const root = d3.hierarchy(data);
     root.sum(d => d.value);
 
     const treemap = d3
       .treemap()
-      .size([height, width])
-      .paddingOuter(10)
-      .paddingInner(1);
+      .size([width, height])
+      .tile(d3.treemapResquarify);
 
     treemap(root);
 
-    const svg = d3
-      .select("#tree-map")
+    const color = d3.scaleOrdinal(d3.schemeDark2);
+    const format = d3.format(",d");
+    d3.select("#tree-map")
       .append("svg")
       .attrs({
         height,
@@ -51,17 +51,24 @@ class App extends Component {
     nodes.append("rect").attrs({
       class: "rect",
       width: d => d.x1 - d.x0,
-      height: d => d.y1 - d.y0
+      height: d => d.y1 - d.y0,
+      fill: d => color(d.data.category)
     });
 
     nodes
       .append("text")
       .attrs({
-        class: "label",
-        dx: 4,
-        dy: 14
+        class: "label"
       })
-      .text(d => d.data.name);
+      .selectAll("tspan")
+      .data(d => d.data.name.split(/(?=[A-Z][^A-Z])/g))
+      .enter()
+      .append("tspan")
+      .attrs({
+        x: 5,
+        y: (d, i) => 10 + i * 12
+      })
+      .text(d => d);
   };
 
   render() {
