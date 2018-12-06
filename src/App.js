@@ -15,7 +15,7 @@ class App extends Component {
   }
 
   drawMap = data => {
-    const height = 600;
+    const height = 575;
     const width = 1200;
 
     const root = d3.hierarchy(data);
@@ -29,8 +29,8 @@ class App extends Component {
     treemap(root);
 
     const color = d3.scaleOrdinal(d3.schemeDark2);
-    const format = d3.format(",d");
-    d3.select("#tree-map")
+    const svg = d3
+      .select("#treemap")
       .append("svg")
       .attrs({
         height,
@@ -61,18 +61,24 @@ class App extends Component {
         class: "label"
       })
       .selectAll("tspan")
-      .data(d => d.data.name.split(/(?=[A-Z][^A-Z])/g))
+      .data(d => d.data.name.split(/(?=[A-Z][^A-Z.])/g))
       .enter()
       .append("tspan")
       .attrs({
-        x: 5,
-        y: (d, i) => 10 + i * 12
+        x: 3,
+        y: (d, i) => 10 + i * 10
       })
       .text(d => d);
   };
 
   render() {
-    return <div id="tree-map" />;
+    return (
+      <div id="container">
+        <h1>Movie Sales</h1>
+        <div>Top 100 Highest Grossing Movies Grouped By Genre</div>
+        <div id="treemap" />
+      </div>
+    );
   }
 }
 
